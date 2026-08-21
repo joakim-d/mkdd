@@ -1,8 +1,14 @@
+#include "Inagaki/GameAudioCommon.h"
+#include "Inagaki/GameAudioCamera.h"
+#include "Inagaki/GameAudioMain.h"
 #include "Inagaki/GameSoundMgr.h"
+#include "Kaneshige/Course/CrsArea.h"
 
 namespace GameAudio {
 
 // TODO
+static const u8 cKartRankClassTable0[7] = {0, 0, 1, 1, 2, 2, 2};
+static const u8 cKartRankClassTable1[7] = {0, 0, 1, 1, 2, 2, 2};
 
 u32 BoundSe[0x19];
 u32 WheelSpinSe[0x19];
@@ -29,7 +35,70 @@ u8 KartSoundMgr::smGoalKartCount;
 u8 KartSoundMgr::smKartRankClassMem[7] = {};
 
 KartSoundMgr::KartSoundMgr(Vec *pos, JKRHeap *heap, u8 p3, u8 p4) : SoundMgr(pos, heap, 12) {
+    _114 = 1.f;
+    _110 = 1.f;
+    _11c = 0;
+    _124 = 1.f;
+    _120 = 1.f;
+    _12c = 0;
+    _C = 0xff;
 
+    _61 = p3;
+
+    if(p3 == 0) {
+        smKartCount++;
+        mKartCount = smKartCount;
+    }
+    else {
+        mKartCount = 4;
+    }
+
+    if(p3 != 2) {
+        smEntryKartCount++;
+    }
+
+    _66 = p4;
+    _130 = new CrsArea();
+    u8 index = 0;
+
+    if(_66 == 0) {
+        _64 = 3;
+    }
+    else {
+        u32 randomValue = GameAudio::Random::getSignalEngineRandomU32();
+        u8 rankClassIndex = randomValue % 7;
+
+        while(smKartRankClassMem[rankClassIndex] == 1 && index < 7)
+        {
+            rankClassIndex = rankClassIndex + 1;
+            index++;
+            if(rankClassIndex == 7)
+            {
+                rankClassIndex = 0;
+            }
+        }
+
+        smKartRankClassMem[rankClassIndex] = 1;
+        u8 playerMode = Parameters::getPlayerMode();
+        if(playerMode != 1)
+        {
+            _64 = cKartRankClassTable0[rankClassIndex];
+        }
+        else {
+            _64 = cKartRankClassTable1[rankClassIndex];
+        }
+    }
+
+    init();
+
+    _7c = 0;
+
+    const u32 sceneMax = Main::getAudio()->getCamera()->getSceneMax();
+
+    if(sceneMax > 1 && sceneMax > mKartCount)
+    {
+        _7c = (1 << mKartCount) ^ 0xf;
+    }
 }
 
 KartSoundMgr::~KartSoundMgr() {}

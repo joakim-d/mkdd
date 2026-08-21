@@ -240,9 +240,20 @@ public:
     u8 _66;
     u8 _67[0x6c - 0x67];
     f32 _6c;
-    u8 _70[0x8d - 0x70];
+    u8 _70[0x7c - 0x70];
+    u32 _7c;
+    u8 _80[0x8d - 0x80];
     u8 _8d;
-    u8 _8e[0x134 - 0x8e];
+    u8 _8e[0x110 - 0x8e];
+    f32 _110;
+    f32 _114;
+    u8 _118[0x11c - 0x118];
+    u32 _11c;
+    f32 _120;
+    f32 _124;
+    u8 _128[0x12c - 0x128];
+    u32 _12c;
+    CrsArea* _130;
 };
 
 class CharacterSoundMgr : public SoundMgr<CharacterSoundMgr> {
@@ -344,6 +355,10 @@ public:
     static CustomAudience<4> *getAudience() { return smAudience; }
 private:
     static CustomAudience<4> *smAudience; // 0x80416278
+
+    JGeometry::TVec3f& getPlayPos(s32 index) { // fabricated
+        return _64[index];
+    }
 
     u8 _5c;
     u8 _5d;
