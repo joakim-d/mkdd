@@ -226,6 +226,15 @@ public:
     void clearInvincibleBgm(u8);                                      // 0x80128c30
     void setChibiFlag(bool, bool);                                    // 0x80128e98
 
+    // UNUSED {
+    void startSoundEngine(u8, u32);
+    void changeAttribute(u8);
+    void checkCourseSound(u8);
+    void setHandleVolume(JAISoundHandle&, f32);
+    void setWaterDepth(f32);
+    void getEngineIDOffsetAtt();
+    // } UNUSED
+
     static u8 smKartCount;
     static u8 smEntryKartCount;
     static u8 smGoalKartCount;
