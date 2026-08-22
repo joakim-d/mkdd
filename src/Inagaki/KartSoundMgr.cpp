@@ -5,6 +5,7 @@
 #include "Inagaki/GameAudioCamera.h"
 #include "Inagaki/GameAudioMain.h"
 #include "JSystem/JAudio/Interface/JAISound.h"
+#include "JSystem/JAudio/JAUSoundObject.h"
 #include "JSystem/JAudio/System/JASGadget.h"
 #include "JSystem/JGeometry/Vec.h"
 #include "Kaneshige/Course/CrsArea.h"
@@ -189,7 +190,11 @@ void KartSoundMgr::startSoundHandleNumber(u8 handleIndex, u32 soundID, u32 fadeC
     setEcho(&handle, _6c);
 }
 
-void KartSoundMgr::dispose() {}
+void KartSoundMgr::dispose() {
+    JAUSoundObject::dispose();
+
+    clearInvincibleBgm(3);
+}
 
 void KartSoundMgr::startSoundEngine(u8, u32) {} // UNUSED
 
