@@ -3,6 +3,7 @@
 #include "Inagaki/GameAudioMain.h"
 #include "Inagaki/GameSoundMgr.h"
 #include "Kaneshige/Course/CrsArea.h"
+#include "JSystem/JAudio/JASFakeMatch2.h"
 
 namespace GameAudio {
 
@@ -103,17 +104,29 @@ KartSoundMgr::KartSoundMgr(Vec *pos, JKRHeap *heap, u8 p3, u8 p4) : SoundMgr(pos
 
 KartSoundMgr::~KartSoundMgr() {}
 
-void KartSoundMgr::startSoundHandleNumber(u8, u32, u32) {}
+void KartSoundMgr::startSoundHandleNumber(u8, u32, u32) {
+    setEcho(NULL, 0);
+}
 
 void KartSoundMgr::dispose() {}
 
+void KartSoundMgr::startSoundEngine(u8, u32) {} // UNUSED
+
 void KartSoundMgr::init() {}
 
+void KartSoundMgr::changeAttribute(u8) {} // UNUSED
+
 void KartSoundMgr::changeDriver(bool) {}
+
+void KartSoundMgr::checkCourseSound(u8) {} // UNUSED
 
 void KartSoundMgr::frameWork(u8) {}
 
 void KartSoundMgr::checkAfterGoalVolume() {}
+
+void KartSoundMgr::setHandleVolume(JAISoundHandle&, f32) {} // UNUSED
+
+void KartSoundMgr::setWaterDepth(f32) {} // UNUSED
 
 void KartSoundMgr::setWaterDepth(u8, f32) {}
 
@@ -122,6 +135,8 @@ void KartSoundMgr::setSlip(u8, u8, u8, f32) {}
 void KartSoundMgr::setConductStatus(f32, f32, bool, bool, bool, u8, CrsArea *) {}
 
 void KartSoundMgr::setWaterCutoffPort(u16) {}
+
+void KartSoundMgr::getEngineIDOffsetAtt() {} // UNUSED
 
 void KartSoundMgr::countGoalKart() {}
 
