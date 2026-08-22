@@ -4,6 +4,9 @@
 #include "Inagaki/GameAudioCommon.h"
 #include "Inagaki/GameAudioCamera.h"
 #include "Inagaki/GameAudioMain.h"
+#include "JSystem/JAudio/Interface/JAISound.h"
+#include "JSystem/JAudio/System/JASGadget.h"
+#include "JSystem/JGeometry/Vec.h"
 #include "Kaneshige/Course/CrsArea.h"
 #include "JSystem/JAudio/JASFakeMatch2.h"
 
@@ -20,15 +23,33 @@ u32 SpinTurnSe[0x19];
 
 f32 GA_ENEMY_VOLUME_DOWN_VALUE = 0.85f;
 const f32 EngineKeisuuRaceUp[] = {
-    0.006f, 0.006f, 0.005f, 0.003f, 
-    0.015f, 0.015f, 0.013f, 0.011f, 
+    0.006f, 0.006f, 0.005f, 0.003f,
+    0.015f, 0.015f, 0.013f, 0.011f,
     0.02f,
 };
 
 const f32 EngineKeisuuRaceDown[] = {
-    0.005f, 0.003f, 0.005f, 0.002f, 
-    0.012f, 0.012f, 0.012f, 0.009f, 
+    0.005f, 0.003f, 0.005f, 0.002f,
+    0.012f, 0.012f, 0.012f, 0.009f,
     0.019f,
+};
+
+const f32 DashEngineAdjustInitialValue[] = {
+    0.3f, 0.3f, 0.3f, 0.3f,
+    0.3f, 0.3f, 0.3f, 0.3f,
+    0.3f
+};
+
+const f32 DashEngineIncPerFrame[] = {
+    0.025f, 0.025f, 0.025f, 0.095f,
+    0.025f, 0.025f, 0.025f, 0.025f,
+    0.025f
+};
+
+const f32 DashEngineDecPerFrame[] = {
+    0.005f, 0.005f, 0.005f, 0.005f,
+    0.005f, 0.005f, 0.005f, 0.005f,
+    0.005f
 };
 
 u8 KartSoundMgr::smKartCount;
@@ -125,8 +146,47 @@ KartSoundMgr::~KartSoundMgr() {
     smGoalKartCount = 0;
 }
 
-void KartSoundMgr::startSoundHandleNumber(u8, u32, u32) {
-    setEcho(NULL, 0);
+void KartSoundMgr::startSoundHandleNumber(u8 handleIndex, u32 soundID, u32 fadeCount) {
+    if(mKillSw || _66 == 2)
+    {
+        return;
+    }
+
+    JAISoundStarter* soundStarter = JASGlobalInstance<JAISoundStarter>::getInstance();
+
+    JAISoundHandle& handle = (*this)[handleIndex];
+
+    soundStarter->startSound(soundID, &handle, NULL);
+
+    JAISound* sound;
+
+    if(!handle.isSoundAttached())
+    {
+        return;
+    }
+
+    if(handle->audible_ == NULL)
+    {
+        Main* main = Main::getAudio();
+        u32 scene = 0;
+        CameraMgr* camera = main->getCamera();
+        u32 sceneMax = camera->getSceneMax();
+
+        if(sceneMax > 1 && sceneMax > mKartCount)
+        {
+            scene = (1 << mKartCount) ^ 0xf;
+        }
+
+        sound = handle.operator->();
+
+        JGeometry::TVec3f vec(*mSoundPos);
+        sound->newAudible(vec, &_18, scene, NULL);
+    }
+    sound = handle.operator->();
+
+    sound->fader_.fadeInFromOut2(fadeCount);
+
+    setEcho(&handle, _6c);
 }
 
 void KartSoundMgr::dispose() {}
