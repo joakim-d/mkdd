@@ -1,7 +1,9 @@
+#include "Inagaki/GameSoundMgr.h"
+
+#include "Inagaki/GameAudioAudience.h"
 #include "Inagaki/GameAudioCommon.h"
 #include "Inagaki/GameAudioCamera.h"
 #include "Inagaki/GameAudioMain.h"
-#include "Inagaki/GameSoundMgr.h"
 #include "Kaneshige/Course/CrsArea.h"
 #include "JSystem/JAudio/JASFakeMatch2.h"
 
@@ -102,7 +104,26 @@ KartSoundMgr::KartSoundMgr(Vec *pos, JKRHeap *heap, u8 p3, u8 p4) : SoundMgr(pos
     }
 }
 
-KartSoundMgr::~KartSoundMgr() {}
+KartSoundMgr::~KartSoundMgr() {
+    setChibiFlag(false, false);
+    for(u8 index = 0; index < 7; index++)
+    {
+        smKartRankClassMem[index] = 0;
+    }
+
+    if(_66 == 0)
+    {
+        const s32 kartCount = mKartCount;
+        if(kartCount < 4)
+        {
+            CustomAudience<4>::smCameraVolume[kartCount] = 1.f;
+        }
+    }
+
+    smKartCount = 0;
+    smEntryKartCount = 0;
+    smGoalKartCount = 0;
+}
 
 void KartSoundMgr::startSoundHandleNumber(u8, u32, u32) {
     setEcho(NULL, 0);
