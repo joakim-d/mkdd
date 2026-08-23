@@ -292,7 +292,52 @@ void KartSoundMgr::changeDriver(bool) {}
 
 void KartSoundMgr::checkCourseSound(u8) {} // UNUSED
 
-void KartSoundMgr::frameWork(u8) {}
+void KartSoundMgr::frameWork(u8 p1) {
+    if(_66 == 0) {
+        _130->search(6, *mSoundPos);
+        Course::Area* area = _130->getArea();
+        if(area != NULL) {
+            ECourseID courseID = Parameters::getRaceCourse();
+            switch(courseID) {
+            case 0x2a:
+                if(p1 <= 3)
+                {
+                    JAISoundHandle& handle = (*this)[7];
+                    if(!handle.isSoundAttached())
+                    {
+                        startSoundHandleNumber(7, 0x40024, 0);
+                    }
+                }
+                break;
+
+            case 0x29:
+                _5c = 1;
+                _6c = 0.5f;
+                break;
+            }
+        }
+        else {
+            ECourseID courseID = Parameters::getRaceCourse();
+            switch(courseID) {
+            case 0x29:
+                _5c = 0;
+                break;
+            }
+        }
+    }
+    checkEcho();
+
+    if(mKillSw || _66 == 2) {
+        return;
+    }
+
+    crushRenzokuTaisaku();
+    slipParamSet();
+    if(_63 != 3) {
+        _65 = p1;
+    }
+    checkAfterGoalVolume();
+}
 
 void KartSoundMgr::checkAfterGoalVolume() {}
 

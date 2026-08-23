@@ -186,7 +186,7 @@ class KartSoundMgr : public SoundMgr<KartSoundMgr>
 public:
     KartSoundMgr(Vec *, JKRHeap *, u8, u8);                           // 0x80123118
     ~KartSoundMgr();                                                  // 0x80123328
-    void startSoundHandleNumber(u8, u32, u32);                        // 0x801233fc
+    virtual void startSoundHandleNumber(u8, u32, u32);                // 0x801233fc
     virtual void dispose();                                           // 0x801236d0
     virtual void init();                                              // 0x80123708
     void changeDriver(bool);                                          // 0x80123ad4
