@@ -4,6 +4,7 @@
 #include "Inagaki/GameAudioCommon.h"
 #include "Inagaki/GameAudioCamera.h"
 #include "Inagaki/GameAudioMain.h"
+#include "Inagaki/GameSoundTable.h"
 #include "JSystem/JAudio/Interface/JAISound.h"
 #include "JSystem/JAudio/JAUSoundObject.h"
 #include "JSystem/JAudio/System/JASGadget.h"
@@ -63,7 +64,7 @@ KartSoundMgr::KartSoundMgr(Vec *pos, JKRHeap *heap, u8 p3, u8 p4) : SoundMgr(pos
     _114 = 1.f;
     _110 = 1.f;
     _11c = 0;
-    _124 = 1.f;
+    mCameraVolume = 1.f;
     _120 = 1.f;
     _12c = 0;
     _C = 0xff;
@@ -198,7 +199,92 @@ void KartSoundMgr::dispose() {
 
 void KartSoundMgr::startSoundEngine(u8, u32) {} // UNUSED
 
-void KartSoundMgr::init() {}
+void KartSoundMgr::init() {
+    _60 = 0;
+    _5d = 0;
+    _68 = 0.f;
+    _63 = 0;
+    _5c = 0;
+    _6c = 0.f;
+    _70 = 0.f;
+    _80 = 0;
+    _84 = 0.f;
+    _88 = 0.f;
+    _8c = 0;
+    _8d = 0;
+    _8e = 0;
+    _90 = 0;
+    _92 = 0;
+    _94 = 0;
+    _96 = 0;
+    _98 = 0.f;
+    _9c = 0;
+    _a0 = 0.f;
+
+    for(u8 index = 0; index < 4; index++)
+    {
+        _a4[index] = 0.f;
+        _b4[index] = 0.f;
+        _c4[index] = 0.f;
+        _e4[index] = 0;
+        _d4[index] = 0.f;
+        _e8[index] = 0;
+    }
+
+    _ec = 0.f;
+    _f0 = 0.f;
+    _f4 = 0;
+    _f8 = 0;
+    _100 = 0;
+    _101 = 0;
+    _102 = 0;
+    _103 = 0;
+    _104 = 0;
+    _105 = 1;
+    _fc = 0.f;
+    _5f = 0;
+    _114 = 0.f;
+    _110 = 0.f;
+    _11c = 0;
+    mCameraVolume = 1.f;
+    _120 = 1.f;
+    _12c = 0.f;
+    _78 = 0;
+    _5e = 0;
+    _74 = 0;
+    _65 = 0xff;
+
+    if(_66 == 0)
+    {
+        const s32 kartCount = mKartCount;
+        const f32 volume = mCameraVolume;
+        if(kartCount < 4)
+        {
+            CustomAudience<4>::smCameraVolume[kartCount] = volume;
+        }
+    }
+
+    Main* main = Main::getAudio();
+    CustomSoundTable* soundTable = main->getSoundTable();
+    for(s32 index = 0; index < _10; index++)
+    {
+        if(!(*this)[index].isSoundAttached())
+        {
+            continue;
+        }
+        JAISound* sound = (*this)[index].operator->();
+        u32 swBit = soundTable->getSwBit(sound->getID().mId.mFullId);
+        if(!(swBit & 0x00800000))
+        {
+            continue;
+        }
+        (*this)[index]->stop();
+    }
+
+    setChibiFlag(false, false);
+    clearInvincibleBgm(3);
+    smGoalKartCount = 0;
+}
 
 void KartSoundMgr::changeAttribute(u8) {} // UNUSED
 
