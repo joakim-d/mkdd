@@ -295,10 +295,10 @@ public:
     f32 _114;
     u8 _118[0x11c - 0x118];
     u32 _11c;
-    f32 _120;
+    f32 mGoalVolume;
     f32 mCameraVolume; // 124
-    u8 _128[0x12c - 0x128];
-    u32 _12c;
+    f32 mDeltaVolume; // 128
+    u32 mGoalVolumeCounter; // 12c
     CrsArea* _130;
 };
 

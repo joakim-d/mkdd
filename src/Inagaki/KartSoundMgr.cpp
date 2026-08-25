@@ -12,6 +12,11 @@
 #include "Kaneshige/Course/CrsArea.h"
 #include "JSystem/JAudio/JASFakeMatch2.h"
 
+static bool float_equal(f32 f1, f32 f2) {
+    return f1 == f2;
+}
+    // } FABRICATED)
+
 namespace GameAudio {
 
 // TODO
@@ -60,13 +65,14 @@ u8 KartSoundMgr::smGoalKartCount;
 
 u8 KartSoundMgr::smKartRankClassMem[7] = {};
 
-KartSoundMgr::KartSoundMgr(Vec *pos, JKRHeap *heap, u8 p3, u8 p4) : SoundMgr(pos, heap, 12) {
+KartSoundMgr::KartSoundMgr(Vec *pos, JKRHeap *heap, u8 p3, u8 p4)
+    : SoundMgr(pos, heap, 12) {
     _114 = 1.f;
     _110 = 1.f;
     _11c = 0;
     mCameraVolume = 1.f;
-    _120 = 1.f;
-    _12c = 0;
+    mGoalVolume = 1.f;
+    mGoalVolumeCounter = 0;
     _C = 0xff;
 
     _61 = p3;
@@ -247,8 +253,8 @@ void KartSoundMgr::init() {
     _110 = 0.f;
     _11c = 0;
     mCameraVolume = 1.f;
-    _120 = 1.f;
-    _12c = 0.f;
+    mGoalVolume = 1.f;
+    mGoalVolumeCounter = 0.f;
     _78 = 0;
     _5e = 0;
     _74 = 0;
@@ -339,7 +345,89 @@ void KartSoundMgr::frameWork(u8 p1) {
     checkAfterGoalVolume();
 }
 
-void KartSoundMgr::checkAfterGoalVolume() {}
+void KartSoundMgr::checkAfterGoalVolume() {
+    if(_66 != 0) {
+        return;
+    }
+
+    if(_5e != 1)
+    {
+        return;
+    }
+
+    const f32 goalVolumeOn = 0.35f;
+    const f32 goalVolumeOff = 0.0f;
+    if(_78 == 0) {
+        JAISoundHandle& handle = (*this)[3];
+        if(handle.isSoundAttached())
+        {
+            handle->stop();
+        }
+
+        Main* main = Main::getAudio();
+        CameraMgr* camera = main->getCamera();
+
+        if(camera->getSceneMax() == 2) {
+            u8 mode = Parameters::getRaceMode();
+            if(mode == 1) {
+                _7c = 0xc;
+                _80 = 0x78;
+            }
+        }
+    }
+    else if (_78 == 0x3c) {
+        if(mGoalVolumeCounter != 0 || !float_equal(mCameraVolume, goalVolumeOn))
+        {
+            if(mGoalVolumeCounter == 0 || !float_equal(mGoalVolume,goalVolumeOn)) {
+                mGoalVolume = goalVolumeOn;
+                mDeltaVolume = (mCameraVolume - mGoalVolume) / 61.f;
+                mGoalVolumeCounter = 0x3d;
+            }
+        }
+    }
+    else if (_78 == 0x168) {
+        if(mGoalVolumeCounter != 0 || !float_equal(mCameraVolume, goalVolumeOff))
+        {
+            if(mGoalVolumeCounter == 0 || !float_equal(mGoalVolume, goalVolumeOff))
+            {
+                mGoalVolume = goalVolumeOff;
+                mDeltaVolume = (mCameraVolume - mGoalVolume) / 301.f;
+                mGoalVolumeCounter = 0x12d;
+            }
+        }
+    }
+    _78++;
+
+    u8 camera;
+    if(mGoalVolumeCounter == 0)
+    {
+        camera = 0;
+    }
+    else {
+        if(--mGoalVolumeCounter){
+            camera = 1;
+            mCameraVolume -= mDeltaVolume;
+        }
+        else {
+            camera = 1;
+            mCameraVolume = mGoalVolume;
+        }
+    }
+
+    if(camera == 0)
+    {
+        return;
+    }
+
+    s32 kartCount = mKartCount;
+    f32 cameraVolume = mCameraVolume;
+
+    if(kartCount >= 4){
+        return;
+    }
+
+    CustomAudience<4>::smCameraVolume[kartCount] = cameraVolume;
+}
 
 void KartSoundMgr::setHandleVolume(JAISoundHandle&, f32) {} // UNUSED
 
