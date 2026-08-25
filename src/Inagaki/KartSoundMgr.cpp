@@ -233,7 +233,7 @@ void KartSoundMgr::init() {
         _b4[index] = 0.f;
         _c4[index] = 0.f;
         _e4[index] = 0;
-        _d4[index] = 0.f;
+        mWaterDepths[index] = 0.f;
         _e8[index] = 0;
     }
 
@@ -433,7 +433,9 @@ void KartSoundMgr::setHandleVolume(JAISoundHandle&, f32) {} // UNUSED
 
 void KartSoundMgr::setWaterDepth(f32) {} // UNUSED
 
-void KartSoundMgr::setWaterDepth(u8, f32) {}
+void KartSoundMgr::setWaterDepth(u8 index, f32 depth) {
+    mWaterDepths[index] = depth;
+}
 
 void KartSoundMgr::setSlip(u8, u8, u8, f32) {}
 

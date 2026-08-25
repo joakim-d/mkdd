@@ -275,7 +275,7 @@ public:
     f32 _a4[4];
     f32 _b4[4];
     f32 _c4[4];
-    f32 _d4[4];
+    f32 mWaterDepths[4];
     u8 _e4[4];
     u8 _e8[4];
     f32 _ec;
