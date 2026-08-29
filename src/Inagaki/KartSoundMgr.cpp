@@ -11,6 +11,7 @@
 #include "JSystem/JGeometry/Vec.h"
 #include "Kaneshige/Course/CrsArea.h"
 #include "JSystem/JAudio/JASFakeMatch2.h"
+#include "Kaneshige/Course/CrsGround.h"
 
 static bool float_equal(f32 f1, f32 f2) {
     return f1 == f2;
@@ -20,7 +21,7 @@ static bool float_equal(f32 f1, f32 f2) {
 namespace GameAudio {
 
 // TODO
-static const u8 cKartRankClassTable0[7] = {0, 0, 1, 1, 2, 2, 2};
+static const u8 cKartRankClassTable0[7] = {0, 0, 1, 1, 1, 2, 2};
 static const u8 cKartRankClassTable1[7] = {0, 0, 1, 1, 2, 2, 2};
 
 u32 BoundSe[0x19];
@@ -441,11 +442,26 @@ void KartSoundMgr::setSlip(u8, u8, u8, f32) {}
 
 void KartSoundMgr::setConductStatus(f32, f32, bool, bool, bool, u8, CrsArea *) {}
 
-void KartSoundMgr::setWaterCutoffPort(u16) {}
+void KartSoundMgr::setWaterCutoffPort(u16 port) {
+    JAISoundHandle &handle = (*this)[3];
+    if (handle.isSoundAttached()) {
+        handle->getTrack()->writePort(0xa, port);
+    }
+}
 
 void KartSoundMgr::getEngineIDOffsetAtt() {} // UNUSED
 
-void KartSoundMgr::countGoalKart() {}
+void KartSoundMgr::countGoalKart() {
+    if(_5e != 0){
+        return;
+    }
+
+    if(_63 == _8d)
+    {
+        return;
+    }
+    smGoalKartCount++;
+}
 
 void KartSoundMgr::setConductLocomotiveAccel() {}
 
@@ -461,11 +477,87 @@ void KartSoundMgr::setConductTrouble(f32, u8) {}
 
 void KartSoundMgr::setConductRace(bool) {}
 
-void KartSoundMgr::setConductAfterGoal(bool) {}
+void KartSoundMgr::setConductAfterGoal(bool enable) {
+    setConductRace(enable);
+}
 
-void KartSoundMgr::setCrushSe(CrsGround::EMat, f32) {}
+void KartSoundMgr::setCrushSe(CrsGround::EMat mat, f32 f1) {
+    switch (mat) {
+    case CrsGround::Mat_5:
+    case CrsGround::Mat_17:
+        setCrushSe(0x1001DU, f1);
+        return;
+    case CrsGround::Mat_8:
+        setCrushSe(0x10015U, f1);
+        return;
+    case CrsGround::Mat_7:
+    case CrsGround::Mat_15:
+        setCrushSe(0x10021U, f1);
+        return;
+    case CrsGround::Mat_16:
+        setCrushSe(0x10023U, f1);
+        return;
+    case CrsGround::Mat_18:
+        setCrushSe(0x10053U, f1);
+        return;
+    case CrsGround::Mat_19:
+        setCrushSe(0x10056U, f1);
+        return;
+    case CrsGround::Mat_9:
+        setCrushSe(0x10019U, f1);
+        return;
+    case CrsGround::Mat_25:
+        setCrushSe(0x10067U, f1);
+        return;
+    case CrsGround::Mat_27:
+        setCrushSe(0x1007DU, f1);
+        return;
+    case CrsGround::Mat_255:
+        break;
+    default:
+        setCrushSe(0x10015U, f1);
+        return;
+    }
+}
 
-void KartSoundMgr::setCrushSe(u32, f32) {}
+void KartSoundMgr::setCrushSe(u32 r4, f32 f1) {
+    const u32 randomId = Common::changeRandomId(r4, 0);
+    const u32 randomId2 = Random::getRandomU32();
+
+    if(mKillSw || _66 == 2) {
+        return;
+    }
+
+    if(_66 != 0) {
+        return;
+    }
+
+    Main* main = Main::getAudio();
+
+    if(main->get_80() - _74 < 0x3c) {
+        return;
+    }
+
+    _74 = main->get_80();
+
+    if(_9c != 0) {
+        return;
+    }
+
+    startSoundHandleNumber(0, randomId, 0);
+
+    JAISoundHandle& handle = (*this)[0];
+    const f32 f30 = f1 + 0.6f;
+    if(handle.isSoundAttached()) {
+        const f32 volume = f30 * 0.8f;
+        handle->getAuxiliary().moveVolume(volume, 0);
+        _a0 = f30;
+    }
+
+    u8 r3 = (randomId2 & 0x7);
+
+    _9c = r3 + 4;
+}
 
 void KartSoundMgr::setBrakeSe(u32) {}
 

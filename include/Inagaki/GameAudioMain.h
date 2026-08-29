@@ -111,6 +111,10 @@ public:
     }
 
     CustomMgr *getCustomMgr() { return mMgr; }
+
+    u32 get_80() const {
+        return _80;
+    }
     // } FABRICATED
 
     CameraMgr *getCamera() {
@@ -145,7 +149,8 @@ private:
     JAISoundHandle _68;           //
     JAISoundHandle _6c;           //
     JAISoundHandle _70;           //
-    u8 _74[0xa8 - 0x74];          //
+    u8 _74[0x80 - 0x74];          //
+    u32 _80;                      //
     JAISoundHandle _84[4];        // 
     u8 _94[0xa8 - 0x94];          //
 
