@@ -74,15 +74,14 @@ KartSoundMgr::KartSoundMgr(Vec *pos, JKRHeap *heap, u8 p3, u8 p4)
 
     _61 = p3;
 
-    if(p3 == 0) {
-        smKartCount++;
-        mKartCount = smKartCount;
+    if(p4 == 0) {
+        mKartCount = smKartCount++;
     }
     else {
         mKartCount = 4;
     }
 
-    if(p3 != 2) {
+    if(p4 != 2) {
         smEntryKartCount++;
     }
 
@@ -99,9 +98,9 @@ KartSoundMgr::KartSoundMgr(Vec *pos, JKRHeap *heap, u8 p3, u8 p4)
 
         while(smKartRankClassMem[rankClassIndex] == 1 && index < 7)
         {
-            rankClassIndex = rankClassIndex + 1;
             index++;
-            if(rankClassIndex == 7)
+
+            if(++rankClassIndex == 7)
             {
                 rankClassIndex = 0;
             }
