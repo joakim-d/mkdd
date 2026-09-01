@@ -858,7 +858,7 @@ void KartSoundMgr::setCrushSe(CrsGround::EMat mat, f32 f1) {
 }
 
 void KartSoundMgr::setCrushSe(u32 r4, f32 f1) {
-    const u32 randomId = Common::changeRandomId(r4, 0);
+    r4 = Common::changeRandomId(r4, 0);
     const u32 randomId2 = Random::getRandomU32();
 
     if(mKillSw || _66 == 2) {
@@ -881,12 +881,13 @@ void KartSoundMgr::setCrushSe(u32 r4, f32 f1) {
         return;
     }
 
-    startSoundHandleNumber(0, randomId, 0);
+    startSoundHandleNumber(0, r4, 0);
 
     JAISoundHandle& handle = (*this)[0];
+    f32 volume;
     const f32 f30 = f1 + 0.6f;
     if(handle.isSoundAttached()) {
-        const f32 volume = f30 * 0.8f;
+        volume = 0.8f * f30;
         handle->getAuxiliary().moveVolume(volume, 0);
         _a0 = f30;
     }
