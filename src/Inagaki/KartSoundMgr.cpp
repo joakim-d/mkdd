@@ -449,11 +449,13 @@ void KartSoundMgr::setSlip(u8 wheel, u8 r5, u8 r6, f32 slip) {
         return;
     }
 
-    f32 f29;
     f32 f28 = slip;
     u32 r27 = r5;
+
     f32 f30 = 0.f;
     f32 f31 = 1.f;
+    f32 f29;
+
     u8 r6_2;
     switch(r5) {
     case 0x11:
@@ -609,11 +611,11 @@ void KartSoundMgr::setSlip(u8 wheel, u8 r5, u8 r6, f32 slip) {
     {
         f32 f4 = _84;
         f32 f0 = 5.f;
+
         if(f4 < f0)
         {
             return;
         }
-        f0 = 0.0026666666;
         f32 f1 = 0.7;
         f32 f2;
         f32 f5;
@@ -670,14 +672,11 @@ void KartSoundMgr::setSlip(u8 wheel, u8 r5, u8 r6, f32 slip) {
                         f1 = 70.f;
                         f0 = 1.f;
                         f2 = f4 / f1;
-                        if(f2 > f0)
+                        if(f2 > 1.f)
                         {
                             f2 = f0;
                         }
-                        f0 = f28 - f29;
-                        f1 = 0.4f;
-                        f0 += f1;
-                        f30 = f2 * f0;
+                        f30 = f2 * (f28 - f29 + 0.4f);
                         break;
                 }
                 break;
@@ -688,25 +687,19 @@ void KartSoundMgr::setSlip(u8 wheel, u8 r5, u8 r6, f32 slip) {
                 {
                     case 0x14:
                     case 0x15:
-                        f0 = f28 - f29;
-                        f1 = 0.2f;
-                        f3 = 0.0026666666f;
-                        f2 = 0.7f;
-                        f30 = f1 + f0;
-                        f31 = (f3 * f4) + f2;
+                        f31 = (f4 * 0.0026666666f) + 0.7f;
+                        f30 = (f28 - f29) + 0.2f;
                         break;
                     case 0xa:
                         f0 = 40.f;
                         f1 = mWaterDepths[wheel];
-                        if(f1 > f0)
+                        if(f1 > 40.f)
                         {
                             f1 = f0;
                         }
-                        f2 = 40.f;
-                        f0 = 10.f;
-                        f1 = f2 - f1;
-                        f5 = f1 / f2;
-                        if(f4 < f0)
+
+                        f5 = (40.f - f1) / 40.f;
+                        if(f4 < 10.f)
                         {
                             f30 = 0.f;
                         }
@@ -734,14 +727,11 @@ void KartSoundMgr::setSlip(u8 wheel, u8 r5, u8 r6, f32 slip) {
                 f1 = 70.f;
                 f0 = 1.f;
                 f2 = f4 / f1;
-                if(f0 > f2)
+                if(f2 > f0)
                 {
                     f2 = f0;
                 }
-                f0 = f28 - f29;
-                f1 = 0.4f;
-                f0 = f1 + f0;
-                f30 = f2 * f0;
+                f30 = f2 * (f28 - f29 + 0.4f);
                 break;
         } // 438 ?
         f0 = 0.1f;
