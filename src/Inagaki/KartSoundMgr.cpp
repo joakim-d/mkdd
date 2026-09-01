@@ -9,14 +9,10 @@
 #include "JSystem/JAudio/JAUSoundObject.h"
 #include "JSystem/JAudio/System/JASGadget.h"
 #include "JSystem/JGeometry/Vec.h"
+#include "JSystem/JUtility/JUTAssert.h"
 #include "Kaneshige/Course/CrsArea.h"
 #include "JSystem/JAudio/JASFakeMatch2.h"
 #include "Kaneshige/Course/CrsGround.h"
-
-static bool float_equal(f32 f1, f32 f2) {
-    return f1 == f2;
-}
-    // } FABRICATED)
 
 namespace GameAudio {
 
@@ -356,8 +352,6 @@ void KartSoundMgr::checkAfterGoalVolume() {
         return;
     }
 
-    const f32 goalVolumeOn = 0.35f;
-    const f32 goalVolumeOff = 0.0f;
     if(_78 == 0) {
         JAISoundHandle& handle = (*this)[3];
         if(handle.isSoundAttached())
@@ -377,9 +371,10 @@ void KartSoundMgr::checkAfterGoalVolume() {
         }
     }
     else if (_78 == 0x3c) {
-        if(mGoalVolumeCounter != 0 || !float_equal(mCameraVolume, goalVolumeOn))
+        const f32 goalVolumeOn = 0.35f;
+        if(mGoalVolumeCounter != 0 || !isCameraVolumeEqual(goalVolumeOn))
         {
-            if(mGoalVolumeCounter == 0 || !float_equal(mGoalVolume,goalVolumeOn)) {
+            if(mGoalVolumeCounter == 0 || !isGoalVolumeEqual(goalVolumeOn)) {
                 mGoalVolume = goalVolumeOn;
                 mDeltaVolume = (mCameraVolume - mGoalVolume) / 61.f;
                 mGoalVolumeCounter = 0x3d;
@@ -387,9 +382,10 @@ void KartSoundMgr::checkAfterGoalVolume() {
         }
     }
     else if (_78 == 0x168) {
-        if(mGoalVolumeCounter != 0 || !float_equal(mCameraVolume, goalVolumeOff))
+        const f32 goalVolumeOff = 0.0f;
+        if(mGoalVolumeCounter != 0 || !isCameraVolumeEqual(goalVolumeOff))
         {
-            if(mGoalVolumeCounter == 0 || !float_equal(mGoalVolume, goalVolumeOff))
+            if(mGoalVolumeCounter == 0 || !isGoalVolumeEqual(goalVolumeOff))
             {
                 mGoalVolume = goalVolumeOff;
                 mDeltaVolume = (mCameraVolume - mGoalVolume) / 301.f;
@@ -438,7 +434,358 @@ void KartSoundMgr::setWaterDepth(u8 index, f32 depth) {
     mWaterDepths[index] = depth;
 }
 
-void KartSoundMgr::setSlip(u8, u8, u8, f32) {}
+void KartSoundMgr::setSlip(u8 wheel, u8 r5, u8 r6, f32 slip) {
+    #line 907
+    JUT_ASSERT_MSG(wheel < 4, "KartSoundMgr::setSlip wheel ERROR!!!\n");
+
+    _e8[wheel] = r5;
+    if(mKillSw || _66 == 2)
+    {
+        return;
+    }
+
+    if(_66 != 0)
+    {
+        return;
+    }
+
+    f32 f29;
+    f32 f28 = slip;
+    u32 r27 = r5;
+    f32 f30 = 0.f;
+    f32 f31 = 1.f;
+    u8 r6_2;
+    switch(r5) {
+    case 0x11:
+        {
+            if(mWaterDepths[wheel] <= f30)
+            {
+                switch(r6) {
+                    case 0xa:
+                        f29 = 0.1f;
+                        r6_2 = 0x14;
+                        break;
+                    case 0x1c:
+                        f29 = 0.1f;
+                        r6_2 = 0x15;
+                    break;
+                    default:
+                        f29 = 0.f;
+                        r6_2 = 0xff;
+                }
+            }
+            else {
+                f29 = 0.f;
+                r6_2 = 0xa;
+            }
+        }
+        break;
+        default:
+        {
+            switch(r6)
+            {
+                case 1:
+                    if(r27 == 1)
+                    {
+                        f29 = 0.1f;
+                    }
+                    else {
+                        f29 = -0.1f;
+                    }
+                    r6_2 = 0;
+                    break;
+                case 0:
+                    f29 = 0.1f;
+                    u8 type = Parameters::getCharacterType(_61);
+                    if(type == 1){
+                        r6_2 = 9;
+                    }
+                    else {
+                        r6_2 = 1;
+                    }
+                    break;
+                case 7:
+                    if(r27 == 1)
+                    {
+                        f29 = -0.06f;
+                    }
+                    else {
+                        f29 = -0.1f;
+                    }
+                    r6_2 = 2;
+                    break;
+                case 6:
+                    if(r27 == 1)
+                    {
+                        f29 = f30;
+                    }
+                    else {
+                        f29 = 0.1f;
+                    }
+                    r6_2 = 3;
+                    break;
+                case 2:
+                    f29 = 0.1f;
+                    r6_2 = 4;
+                    break;
+                case 8:
+                    f29 = 0.1f;
+                    r6_2 = 0x13;
+                    break;
+                case 3:
+                    f29 = -0.1f;
+                    r6_2 = 5;
+                    break;
+                case 5:
+                    f29 = -0.1f;
+                    r6_2 = 6;
+                    break;
+                case 14:
+                    f29 = 0.1f;
+                    r6_2 = 0xd;
+                    break;
+                case 20:
+                    f29 = 0.1f;
+                    r6_2 = 0xf;
+                    break;
+                case 22:
+                    f29 = -0.06f;
+                    r6_2 = 0xc;
+                    break;
+                case 13:
+                    f29 = -0.06f;
+                    r6_2 = 0xe;
+                    break;
+                case 10:
+                    f29 = 0.1f;
+                    r6_2 = 0x14;
+                    break;
+                case 28:
+                    f29 = 0.1f;
+                    r6_2 = 0x15;
+                    break;
+                case 12:
+                    f29 = 0.1f;
+                    r6_2 = 0xb;
+                    break;
+                case 21:
+                    f29 = 0.1f;
+                    r6_2 = 0x10;
+                    break;
+                case 11:
+                    f29 = 0.1f;
+                    r6_2 = 0x11;
+                    break;
+                case 23:
+                    f29 = 0.1f;
+                    r6_2 = 0x16;
+                    break;
+                case 24:
+                    f29 = 0.1f;
+                    r6_2 = 0x17;
+                    break;
+                case 4:
+                case 9:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 25:
+                case 26:
+                case 27:
+                default:
+                    f29 = 0.f;
+                    r6_2 = 0xff;
+                    break;
+            }
+            // 294
+        }
+    }
+
+    _105 = r6_2;
+
+    if(r6_2 != 0xff && _8d != 0)
+    {
+        f32 f4 = _84;
+        f32 f0 = 5.f;
+        if(f4 < f0)
+        {
+            return;
+        }
+        f0 = 0.0026666666;
+        f32 f1 = 0.7;
+        f32 f2;
+        f32 f5;
+        f32 f3;
+        u32 r0;
+
+        switch(r5)
+        {
+            case 0:
+            case 1:
+            case 0x0c:
+                switch(r6)
+                {
+                    default:
+                    case 3:
+                        f1 = 0.0026666666f;
+                        f0 = 0.7f;
+                        f31 = (f1 * f4) + f0;
+                    case 11:
+                    case 12:
+                    case 20:
+                    case 28:
+                        f0 = f28 - f29;
+                        f1 = 0.2f;
+                        f30 = f1 + f0;
+                        break;
+                    case 0:
+                    case 1:
+                    case 4:
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 9:
+                    case 15:
+                    case 16:
+                    case 17:
+                    case 18:
+                    case 19:
+                    case 21:
+                    case 23:
+                    case 24:
+                    case 25:
+                    case 26:
+                    case 27:
+                        f1 = 0.0026666666f;
+                        f0 = 0.7f;
+                        f31 = (f1 * f4) + f0;
+                    case 2:
+                    case 5:
+                    case 10:
+                    case 13:
+                    case 14:
+                    case 22:
+                        f1 = 70.f;
+                        f0 = 1.f;
+                        f2 = f4 / f1;
+                        if(f2 > f0)
+                        {
+                            f2 = f0;
+                        }
+                        f0 = f28 - f29;
+                        f1 = 0.4f;
+                        f0 += f1;
+                        f30 = f2 * f0;
+                        break;
+                }
+                break;
+
+                break;
+            case 0x11:
+                switch(r6_2)
+                {
+                    case 0x14:
+                    case 0x15:
+                        f0 = f28 - f29;
+                        f1 = 0.2f;
+                        f3 = 0.0026666666f;
+                        f2 = 0.7f;
+                        f30 = f1 + f0;
+                        f31 = (f3 * f4) + f2;
+                        break;
+                    case 0xa:
+                        f0 = 40.f;
+                        f1 = mWaterDepths[wheel];
+                        if(f1 > f0)
+                        {
+                            f1 = f0;
+                        }
+                        f2 = 40.f;
+                        f0 = 10.f;
+                        f1 = f2 - f1;
+                        f5 = f1 / f2;
+                        if(f4 < f0)
+                        {
+                            f30 = 0.f;
+                        }
+                        else {
+                            f1 = 70.f;
+                            f0 = 1.f;
+                            f4 /= f1;
+                            if(f4 > f0)
+                            {
+                                f4 = f0;
+                            }
+                            f0 = 0.53f;
+                            f3 = 1.2f;
+                            f1 = f0 * f4;
+                            f2 = 0.2f;
+                            f0 = 0.79f;
+                            f30 = (f3 * f4) + f2;
+                            f31 = (f5 * f1) + f0;
+                        }
+                    break;
+                }
+                break;
+
+            default:
+                f1 = 70.f;
+                f0 = 1.f;
+                f2 = f4 / f1;
+                if(f0 > f2)
+                {
+                    f2 = f0;
+                }
+                f0 = f28 - f29;
+                f1 = 0.4f;
+                f0 = f1 + f0;
+                f30 = f2 * f0;
+                break;
+        } // 438 ?
+        f0 = 0.1f;
+        if(f30 <= f0){
+            return;
+        }
+        f0 = 1.5f;
+        if(f30 > f0){
+            f30 = f0;
+        }
+        _e4[wheel] = 1;
+
+        _b4[wheel] = f30;
+
+        bool isRightWheel = wheel & 1;
+        if(isRightWheel)
+        {
+            f0 = 0.47f;
+            _a4[wheel] = f0;
+        }
+        else {
+            f0 = 0.53f;
+            _a4[wheel] = f0;
+        }
+        _c4[wheel] = f31;
+
+        switch(wheel)
+        {
+            case 0:
+                _104 = r6_2;
+                break;
+            case 1:
+            case 2:
+            case 3:
+                r0 = _104;
+                if(r0 != 6 && r0 != 5 && r0 != 10)
+                {
+                    _104 = r6_2;
+                }
+                break;
+        }
+    }
+    //4d8
+}
 
 void KartSoundMgr::setConductStatus(f32, f32, bool, bool, bool, u8, CrsArea *) {}
 

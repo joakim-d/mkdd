@@ -240,6 +240,14 @@ public:
 
     static u8 smKartRankClassMem[7];
 
+    bool isGoalVolumeEqual(f32 volume) const {
+        return mGoalVolume == volume;
+    }
+
+    bool isCameraVolumeEqual(f32 volume) const {
+        return mCameraVolume == volume;
+    }
+
     u8 _5c;
     u8 _5d;
     u8 _5e;
@@ -275,7 +283,7 @@ public:
     f32 _a4[4];
     f32 _b4[4];
     f32 _c4[4];
-    f32 mWaterDepths[4];
+    f32 mWaterDepths[4]; // d4
     u8 _e4[4];
     u8 _e8[4];
     f32 _ec;
