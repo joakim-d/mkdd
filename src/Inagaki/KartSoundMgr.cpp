@@ -5,14 +5,17 @@
 #include "Inagaki/GameAudioCamera.h"
 #include "Inagaki/GameAudioMain.h"
 #include "Inagaki/GameSoundTable.h"
+
 #include "JSystem/JAudio/Interface/JAISound.h"
 #include "JSystem/JAudio/JAUSoundObject.h"
 #include "JSystem/JAudio/System/JASGadget.h"
 #include "JSystem/JGeometry/Vec.h"
 #include "JSystem/JUtility/JUTAssert.h"
-#include "Kaneshige/Course/CrsArea.h"
 #include "JSystem/JAudio/JASFakeMatch2.h"
+
+#include "Kaneshige/Course/CrsArea.h"
 #include "Kaneshige/Course/CrsGround.h"
+#include "kartEnums.h"
 
 namespace GameAudio {
 
@@ -776,7 +779,196 @@ void KartSoundMgr::setSlip(u8 wheel, u8 r5, u8 r6, f32 slip) {
     //4d8
 }
 
-void KartSoundMgr::setConductStatus(f32, f32, bool, bool, bool, u8, CrsArea *) {}
+void KartSoundMgr::setConductStatus(f32 f1, f32 f2, bool r4, bool r5, bool r6, u8 r7, CrsArea *r8) {
+    if(r8 != NULL && _5c == 0)
+    {
+        f32 rate = r8->getRate();
+        f32 zeroValue = 0.f;
+        if(rate != zeroValue)
+        {
+            _6c = 0.8f * r8->getEchoRate();
+            if(_6c > 0.8f)
+            {
+                _6c = 0.8f;
+            }
+        }
+        else {
+            _6c = zeroValue;
+        }
+    }
+
+    if(mKillSw || _66 == 2)
+    {
+        return;
+    }
+
+    _88 = f1;
+    _84 = f2;
+
+    if(r6)
+    {
+        if(f2 < 1.0f)
+        {
+            r6 = 0;
+        }
+    }
+
+    if(r6)
+    {
+        _8c = r5;
+    }
+    else {
+        _8c = r4;
+    }
+    _8d = r7;
+
+    u8 characterType = Parameters::getCharacterType(_61);
+
+    if(characterType != 9)
+    {
+        ECourseID id;
+        switch(_8d)
+        {
+            case 0:
+                setConductSignal();
+                setWaterCutoffPort(0);
+                break;
+            case 1:
+                setConductOutOfCourse(r7);
+                setWaterCutoffPort(0);
+                if(_66 != 0)
+                {
+                    break;
+                }
+                if(_63 == r7)
+                {
+                    break;
+                }
+                id = Parameters::getRaceCourse();
+                if(id != 0x2f)
+                {
+                    break;
+                }
+                startSoundHandleNumber(7, 0x40074, 0);
+                break;
+            case 2:
+                setConductTrouble(f1, r7);
+                setWaterCutoffPort(0);
+
+                if(_66 != 0)
+                {
+                    break;
+                }
+                if(_63 == r7)
+                {
+                    break;
+                }
+
+                id = Parameters::getRaceCourse();
+                if(id == 0x2a)
+                {
+                    startSoundHandleNumber(7, 0x40057, 0);
+                    break;
+                }
+                id = Parameters::getRaceCourse();
+                if(id != 0x2f)
+                {
+                    break;
+                }
+                startSoundHandleNumber(7, 0x40074, 0);
+                break;
+            case 3:
+                countGoalKart();
+                _8c = 1;
+                setConductAfterGoal(r6);
+                _5e = 1;
+                break;
+            case 4:
+                setConductRace(r6);
+                // _66
+                break;
+            case 5:
+                if(_66 == 0 && _63 != r7 && Parameters::getRaceCourse() == 0x2f)
+                {
+                    startSoundHandleNumber(7, 0x40074, 0);
+                }
+                setConductPressed();
+                break;
+            case 6:
+            default:
+                break;
+        }
+    }
+    else {
+        ECourseID id;
+        switch(_8d)
+        {
+            case 0:
+            case 2:
+            case 4:
+                if(_63 != r7)
+                {
+                    _8e = 0;
+                    _92 = 0;
+                }
+                setConductLocomotiveAccel();
+                if(_66 != 0)
+                {
+                    break;
+                }
+                if(_63 == r7)
+                {
+                    break;
+                }
+                id = Parameters::getRaceCourse();
+                if(id == 0x2a)
+                {
+                    startSoundHandleNumber(7, 0x40057, 0);
+                    break;
+                }
+                id = Parameters::getRaceCourse();
+                if(id == 0x2f)
+                {
+                    startSoundHandleNumber(7, 0x40074, 0);
+                }
+                break;
+
+            case 3:
+                countGoalKart();
+                _8c = 1;
+                _5e = 1;
+
+            case 1:
+                if(_63 != r7)
+                {
+                    _8e = 0;
+                    _92 = 0;
+                }
+
+                setConductLocomotiveSpeed(r6);
+                break;
+            case 5:
+                if(_66 == 0 && _63 != r7)
+                {
+                    id = Parameters::getRaceCourse();
+                    if(id == 0x2f)
+                    {
+                        startSoundHandleNumber(7, 0x40074, 0);
+                    }
+                }
+
+                setConductPressed();
+                break;
+            case 6:
+            default:
+                break;
+        }
+    }
+
+    _68 = f1;
+    _63 = r7;
+    _98 = _84;
+}
 
 void KartSoundMgr::setWaterCutoffPort(u16 port) {
     JAISoundHandle &handle = (*this)[3];

@@ -240,6 +240,7 @@ public:
 
     static u8 smKartRankClassMem[7];
 
+    // FABRICATED {
     bool isGoalVolumeEqual(f32 volume) const {
         return mGoalVolume == volume;
     }
@@ -247,6 +248,7 @@ public:
     bool isCameraVolumeEqual(f32 volume) const {
         return mCameraVolume == volume;
     }
+    // } FABRICATED
 
     u8 _5c;
     u8 _5d;
