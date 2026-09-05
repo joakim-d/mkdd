@@ -992,6 +992,43 @@ void KartSoundMgr::countGoalKart() {
     smGoalKartCount++;
 }
 
+void KartSoundMgr::startSoundFromID(u32 id)
+{
+    u32 r6;
+    JAISound* sound;
+
+    JAISoundStarter* soundStarter = JASGlobalInstance<JAISoundStarter>::getInstance();
+
+    JAISoundHandle& handle = (*this)[3];
+
+    id += (_66 != 0 ? 0x14 : 0);
+
+    soundStarter->startSound(
+        id,
+        &handle,
+        NULL);
+
+    if(handle.isSoundAttached())
+    {
+        JAIAudible* audible = handle->getAudible();
+        if(audible == 0)
+        {
+            r6 = _7c;
+
+            sound = handle.operator->();
+            JGeometry::TVec3f vec(*mSoundPos);
+
+            sound->newAudible(vec, &_18, r6, NULL);
+            if(_80 != 0){
+
+                handle->fader_.fadeInFromOut2(_80);
+                _80 = 0;
+            }
+        }
+        setEcho(&handle, _6c);
+    }
+}
+
 void KartSoundMgr::setConductLocomotiveAccel() {
     u32 r6;
     JAISound* sound;
@@ -1000,7 +1037,6 @@ void KartSoundMgr::setConductLocomotiveAccel() {
     f32 f31;
 
     bool changed = false;
-    u32 soundID;
 
     if(_8c != 0)
     {
@@ -1037,7 +1073,7 @@ void KartSoundMgr::setConductLocomotiveAccel() {
 
     if(changed)
     {
-        soundID = ((_96++ & 1) ? 0x11 : 0x12);
+        const u32 soundID = ((_96++ & 1) ? 0x11 : 0x12);
 
         startSoundFromID(soundID);
         JAISoundHandle& handle_2 = (*this)[3];
@@ -1056,6 +1092,7 @@ void KartSoundMgr::setConductLocomotiveAccel() {
         }
     }
 }
+
 
 void KartSoundMgr::setConductLocomotiveSpeed(bool) {
     u32 r6;
