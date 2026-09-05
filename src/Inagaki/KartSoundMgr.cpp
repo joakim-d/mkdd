@@ -1084,7 +1084,79 @@ void KartSoundMgr::setConductLocomotiveAccel() {
     }
 }
 
-void KartSoundMgr::setConductLocomotiveSpeed(bool) {}
+void KartSoundMgr::setConductLocomotiveSpeed(bool) {
+    u32 r6;
+    JAISound* sound;
+    f32 r4;
+    f32 f31;
+    u32 soundID;
+
+    f31 = _84;
+    if(_8e == 0)
+    {
+        if(f31 < 1.f)
+        {
+            f31 = 1.f;
+        }
+        if(f31 > 130.f)
+        {
+            f31 = 130.f;
+        }
+        _8e = (u16) (3.f + ((130.f - f31) / 20.f));
+
+        soundID = 0x12 + -(_96++ & 1);
+
+        JAISoundStarter *const soundStarter = JASGlobalInstance<JAISoundStarter>::getInstance();
+
+        JAISoundHandle* handle = &(*this)[3];
+
+        soundStarter->startSound(
+            soundID + (_66 != 0 ? 0x14 : 0),
+            handle,
+            NULL);
+
+        if(handle->isSoundAttached())
+        {
+            JAIAudible* audible = (*handle)->getAudible();
+            if(audible == 0)
+            {
+                r6 = _7c;
+
+                sound = (*handle).operator->();
+                JGeometry::TVec3f vec(*mSoundPos);
+
+                sound->newAudible(vec, &_18, r6, NULL);
+                if(_80 != 0){
+
+                    (*handle)->fader_.fadeInFromOut2(_80);
+                    _80 = 0;
+                }
+            }
+            setEcho(handle, _6c);
+        }
+        handle = &(*this)[3];
+        if(!handle->isSoundAttached())
+        {
+            return;
+        }
+        JAISound* sound = handle->operator->();
+        sound->getAuxiliary().moveVolume((0.7f * (f31 / 130.f)) + 0.5f, 0);
+        f32 pitch = 1.f;
+        if(f31 < 100.f) {
+            pitch = f31 / 100.f;
+        }
+        if(_5d != 0)
+        {
+            f32 chibiPitch = Parameters::getChibiPitch(soundID);
+            pitch *= chibiPitch;
+        }
+        r4 = 0.6f + ((0.4f * (9 - _92)) / 5.f);
+        (*handle)->getAuxiliary().movePitch((0.4f * pitch) + 0.6f, 0);
+    }
+    else {
+        _8e--;
+    }
+}
 
 void KartSoundMgr::setConductPressed() {}
 
