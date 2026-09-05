@@ -6,6 +6,7 @@
 #include "Inagaki/GameAudioMain.h"
 #include "Inagaki/GameSoundTable.h"
 
+#include "JSystem/JAudio/Interface/JAIAudible.h"
 #include "JSystem/JAudio/Interface/JAISound.h"
 #include "JSystem/JAudio/JAUSoundObject.h"
 #include "JSystem/JAudio/System/JASGadget.h"
@@ -991,7 +992,97 @@ void KartSoundMgr::countGoalKart() {
     smGoalKartCount++;
 }
 
-void KartSoundMgr::setConductLocomotiveAccel() {}
+void KartSoundMgr::setConductLocomotiveAccel() {
+    u32 r6;
+    JAISound* sound;
+    f32 r4;
+    JAISoundStarter* soundStarter;
+    f32 f31;
+
+    bool changed = false;
+    u32 soundID;
+
+    if(_8c != 0)
+    {
+        if(_8e == 0)
+        {
+            if(_92 == 0)
+            {
+                _92 = 9;
+            }
+            else if(_92 > 4) {
+                _92--;
+            }
+            changed = true;
+            f31 = 0.6f;
+            _8e = _92;
+        }
+    }
+    else if(_8e == 0)
+    {
+        if(_92 == 0)
+        {
+            _92 = 9;
+        }
+        if(_92 < 9){
+            _92++;
+            _8e = _92;
+        }
+        else {
+            _8e = _92;
+        }
+        changed = true;
+        f31 = 0.4f;
+    }
+
+    if(changed)
+    {
+        soundID = ((_96++ & 1) ? 0x11 : 0x12);
+
+        soundStarter = JASGlobalInstance<JAISoundStarter>::getInstance();
+
+        JAISoundHandle& handle = (*this)[3];
+
+        soundStarter->startSound(
+            soundID + (_66 != 0 ? 0x14 : 0),
+            &handle,
+            NULL);
+
+        if(handle.isSoundAttached())
+        {
+            JAIAudible* audible = handle->getAudible();
+            if(audible == 0)
+            {
+                r6 = _7c;
+
+                sound = handle.operator->();
+                JGeometry::TVec3f vec(*mSoundPos);
+
+                sound->newAudible(vec, &_18, r6, NULL);
+                if(_80 != 0){
+
+                    handle->fader_.fadeInFromOut2(_80);
+                    _80 = 0;
+                }
+            }
+            setEcho(&handle, _6c);
+        }
+        JAISoundHandle& handle_2 = (*this)[3];
+        if(!handle_2.isSoundAttached())
+        {
+            return;
+        }
+        handle_2->getAuxiliary().moveVolume(f31, 0);
+        r4 = 0.6f + ((0.4f * (9 - _92)) / 5.f);
+        handle_2->getAuxiliary().movePitch(r4, 0);
+    }
+    else {
+        if(_8e != 0)
+        {
+            _8e--;
+        }
+    }
+}
 
 void KartSoundMgr::setConductLocomotiveSpeed(bool) {}
 
