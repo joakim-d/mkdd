@@ -1039,34 +1039,7 @@ void KartSoundMgr::setConductLocomotiveAccel() {
     {
         soundID = ((_96++ & 1) ? 0x11 : 0x12);
 
-        soundStarter = JASGlobalInstance<JAISoundStarter>::getInstance();
-
-        JAISoundHandle& handle = (*this)[3];
-
-        soundStarter->startSound(
-            soundID + (_66 != 0 ? 0x14 : 0),
-            &handle,
-            NULL);
-
-        if(handle.isSoundAttached())
-        {
-            JAIAudible* audible = handle->getAudible();
-            if(audible == 0)
-            {
-                r6 = _7c;
-
-                sound = handle.operator->();
-                JGeometry::TVec3f vec(*mSoundPos);
-
-                sound->newAudible(vec, &_18, r6, NULL);
-                if(_80 != 0){
-
-                    handle->fader_.fadeInFromOut2(_80);
-                    _80 = 0;
-                }
-            }
-            setEcho(&handle, _6c);
-        }
+        startSoundFromID(soundID);
         JAISoundHandle& handle_2 = (*this)[3];
         if(!handle_2.isSoundAttached())
         {
@@ -1106,35 +1079,9 @@ void KartSoundMgr::setConductLocomotiveSpeed(bool) {
 
         soundID = 0x12 + -(_96++ & 1);
 
-        JAISoundStarter *const soundStarter = JASGlobalInstance<JAISoundStarter>::getInstance();
+        startSoundFromID(soundID);
 
         JAISoundHandle* handle = &(*this)[3];
-
-        soundStarter->startSound(
-            soundID + (_66 != 0 ? 0x14 : 0),
-            handle,
-            NULL);
-
-        if(handle->isSoundAttached())
-        {
-            JAIAudible* audible = (*handle)->getAudible();
-            if(audible == 0)
-            {
-                r6 = _7c;
-
-                sound = (*handle).operator->();
-                JGeometry::TVec3f vec(*mSoundPos);
-
-                sound->newAudible(vec, &_18, r6, NULL);
-                if(_80 != 0){
-
-                    (*handle)->fader_.fadeInFromOut2(_80);
-                    _80 = 0;
-                }
-            }
-            setEcho(handle, _6c);
-        }
-        handle = &(*this)[3];
         if(!handle->isSoundAttached())
         {
             return;
@@ -1158,7 +1105,25 @@ void KartSoundMgr::setConductLocomotiveSpeed(bool) {
     }
 }
 
-void KartSoundMgr::setConductPressed() {}
+void KartSoundMgr::setConductPressed() {
+    startSoundFromID(0x13);
+
+    f32 pitch = _84;
+    if(pitch > 100.f)
+    {
+        pitch = 100.f;
+    }
+
+    pitch = 1.f + (pitch / 100.f);
+
+    JAISoundHandle& handle = (*this)[3];
+    if(!handle.isSoundAttached())
+    {
+        return;
+    }
+
+    handle->getAuxiliary().movePitch(pitch, 0);
+}
 
 void KartSoundMgr::setConductSignal() {}
 
