@@ -1403,7 +1403,56 @@ void KartSoundMgr::setConductOutOfCourse(u8 r4) {
     (*handle)->getAuxiliary().movePitch(pitch, 0);
 }
 
-void KartSoundMgr::setConductTrouble(f32, u8) {}
+void KartSoundMgr::setConductTrouble(f32 f1, u8 r4) {
+    JAISound* sound;
+    f32 volume;
+    u32 soundID;
+
+    if(_63 != r4)
+    {
+        _92 = (u16)(38.f * f1);
+    }
+    if(_8c == 1)
+    {
+        if(_92 < 0x26)
+        {
+            _92++;
+            _92++;
+        }
+        volume = 1.2f;
+    }
+    else {
+        if(_92 != 0)
+        {
+            _92--;
+        }
+        volume = 0.55f;
+    }
+
+    f32 pitch = (EnginePitchKeisuuTrouble[(u8)Parameters::getEngineType(_61)] * _92) + 0.6f;
+
+    if(_66 != 0){
+        volume *= GA_ENEMY_VOLUME_DOWN_VALUE;
+    }
+
+    u8 engineType = Parameters::getEngineType(_61);
+    startSoundFromID(engineType + 8);
+
+    JAISoundHandle* handle = &(*this)[3];
+    if(!handle->isSoundAttached())
+    {
+        return;
+    }
+
+    if(_5d != 0)
+    {
+        f32 chibiPitch = Parameters::getChibiPitch((*handle)->getID());
+        pitch *= chibiPitch;
+        volume *= 0.65f;
+    }
+    (*handle)->getAuxiliary().moveVolume(volume, 0);
+    (*handle)->getAuxiliary().movePitch(pitch, 0);
+}
 
 void KartSoundMgr::setConductRace(bool) {}
 
