@@ -306,7 +306,7 @@ public:
     u8 _106[0x110 - 0x106];
     f32 _110;
     f32 _114;
-    u8 _118[0x11c - 0x118];
+    f32 _118;
     u32 _11c;
     f32 mGoalVolume;
     f32 mCameraVolume; // 124

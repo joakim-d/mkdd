@@ -20,6 +20,13 @@
 
 namespace GameAudio {
 
+const s16 SignalUpPitchWidth[3] = { 0x0064, 0x0082, 0x0078 };
+const s16 SignalUpPitchBase[3] = { 0x0032, 0x0046, 0x0050 };
+const s16 SignalUpIntervalWidth[3] = { 0x0046, 0x001E, 0x000A };
+const s16 SignalUpIntervalBase[3] = { 0x0014, 0x000A, 0x0005 };
+const s16 SignalDownIntervalWidth[3] = { 0x0050, 0x0032, 0x0014 };
+const s16 SignalDownIntervalBase[3] = { 0x0014, 0x000A, 0x0005 };
+
 // TODO
 static const u8 cKartRankClassTable0[7] = {0, 0, 1, 1, 1, 2, 2};
 static const u8 cKartRankClassTable1[7] = {0, 0, 1, 1, 2, 2, 2};
@@ -30,6 +37,8 @@ u32 SpinSe[0x19];
 u32 SpinTurnSe[0x19];
 
 f32 GA_ENEMY_VOLUME_DOWN_VALUE = 0.85f;
+
+
 const f32 EngineKeisuuRaceUp[] = {
     0.006f, 0.006f, 0.005f, 0.003f,
     0.015f, 0.015f, 0.013f, 0.011f,
@@ -992,6 +1001,7 @@ void KartSoundMgr::countGoalKart() {
     smGoalKartCount++;
 }
 
+// FABRICATED {
 void KartSoundMgr::startSoundFromID(u32 id)
 {
     u32 r6;
@@ -1028,6 +1038,7 @@ void KartSoundMgr::startSoundFromID(u32 id)
         setEcho(&handle, _6c);
     }
 }
+// } FABRICATED
 
 void KartSoundMgr::setConductLocomotiveAccel() {
     u32 r6;
@@ -1162,7 +1173,184 @@ void KartSoundMgr::setConductPressed() {
     handle->getAuxiliary().movePitch(pitch, 0);
 }
 
-void KartSoundMgr::setConductSignal() {}
+static const f32 EngineKarabukashiLength[] = {
+    90.f, 40.f, 90.f, 30.f,
+    40.f, 35.f, 30.f, 95.f,
+    90.f
+};
+
+static const f32 EnginePitchKeisuuSignal[] = {
+    0.02f, 0.05f, 0.02f, 0.09f,
+    0.05f, 0.06f, 0.06f, 0.02f,
+    0.05f
+};
+
+static const f32 EnginePitchDownSignal[] = {
+    0.9f, 0.9f, 0.6f, 0.9f,
+    0.9f, 0.7f, 0.7f, 0.6f,
+    0.8f
+};
+
+static const f32 EnginePitchKeisuuOutOfCourse[] = {
+    0.01f, 0.01f, 0.01f, 0.01f,
+    0.01f, 0.01f, 0.01f, 0.01f,
+    0.01f
+};
+
+static const f32 EnginePitchKeisuuTrouble[] = {
+    0.025f, 0.025f, 0.025f, 0.025f,
+    0.025f, 0.025f, 0.025f, 0.025f,
+    0.025f
+};
+
+static const f32 EngineAddKeisuuRaceUp[] = {
+    0.0006f, 0.0006f, 0.0006f, 0.0005f,
+    0.0012f, 0.0012f, 0.0012f, 0.0012f,
+    0.0012f
+};
+
+static const f32 UpEngineLoopStart[] = {
+    100639.f, 133568.f, 121677.f, 89762.f,
+    0.f, 0.f, 0.f, 0.f,
+    0.f
+};
+
+static const f32 UpEngineLoopEnd[] = {
+    113023.f, 167266.f, 138431.f, 100738.f,
+    0.f, 0.f, 0.f, 0.f,
+    0.f
+};
+
+static const f32 EngineAddKeisuuRaceDown[] = {
+    0.00015f, 0.00015f, 0.00015f, 0.00015f,
+    0.0006f, 0.0006f, 0.0006f, 0.0006f,
+    0.0006f
+};
+
+static const f32 DownEngineLoopStart[] = {
+    42032.f, 57452.f, 54457.f, 33775.f,
+    0.f, 0.f, 0.f, 0.f,
+    0.f
+};
+
+static const f32 DownEngineLoopEnd[] = {
+    93600.f, 104350.f, 79743.f, 63943.f,
+    0.f, 0.f, 0.f, 0.f,
+    0.f
+};
+
+void KartSoundMgr::setConductSignal() {
+    if(_63 != _8d)
+    {
+        _fc = 0.f;
+    }
+
+    f32 pitch;
+    f32 volume;
+    if(_66 == 0 || Parameters::getNetworkCubes() != 1)
+    {
+        if(_8c == 1)
+        {
+            volume = 1.4f;
+            f32 length = EngineKarabukashiLength[(u8)Parameters::getEngineType(_61)];
+            if(_fc < length)
+            {
+                _fc = _fc + 1.f;
+            }
+
+            f32 signal = EnginePitchKeisuuSignal[(u8)Parameters::getEngineType(_61)];
+            pitch = (_fc * signal) + 0.7f;
+        }
+        else {
+            volume = 0.7f;
+            if(_fc > 0.f){
+                f32 signal = EnginePitchDownSignal[(u8)Parameters::getEngineType(_61)];
+                _fc -= signal;
+            }
+            else {
+                _fc = 0.f;
+            }
+            f32 signal = EnginePitchKeisuuSignal[(u8)Parameters::getEngineType(_61)];
+            pitch = (_fc * signal) + 0.7f;
+        }
+        if(_fc < 20.f)
+        {
+            volume = ((-0.015000001f * _fc) + volume) + 0.3f;
+        }
+    }
+    else {
+        if(_11c == 0)
+        {
+            _5f ^= 1;
+            if(_5f != 0)
+            {
+                u32 interval = SignalUpIntervalBase[_64] + (Random::getSignalEngineRandomU32() % SignalUpIntervalWidth[_64]);
+                u32 pitchInt = SignalUpPitchBase[_64] + (Random::getSignalEngineRandomU32() % SignalUpPitchWidth[_64]);
+                f32 currentPitch = f32(pitchInt) / 100.f;
+                if((_11c != 0 || _114 != currentPitch) && (_11c == 0 || _110 != currentPitch))
+                {
+                    _110 = currentPitch;
+                    if(interval == 0)
+                    {
+                        _114 = currentPitch;
+                    }
+                    else {
+                        _118 = (_114 - _110) / (f32)(interval + 1);
+                        _11c = interval + 1;
+                    }
+                }
+            }
+            else {
+                u32 interval = SignalDownIntervalBase[_64] + (Random::getSignalEngineRandomU32() % SignalDownIntervalWidth[_64]);
+                f32 volumeC = 0.7f;
+                if ((_11c != 0 || _114 != volumeC) && (_11c == 0 || _110 != volumeC))
+                {
+                    _110 = 0.7f;
+                    if (interval == 0)
+                    {
+                        _114 = 0.7f;
+                    }
+                    else
+                    {
+                        u32 ticks = interval + 1;
+                        _118 = (_114 - _110) / (f32)ticks;
+                        _11c = ticks;
+                    }
+                }
+            }
+        }
+
+        if(_11c != 0)
+        {
+            if(--_11c != 0){
+                _114 -= _118;
+            }
+            else {
+                _114 = _110;
+            }
+        }
+        if(_5f != 0)
+        {
+            volume = 1.4f;
+        }
+        else {
+            volume = 0.7f;
+        }
+
+        pitch = _114;
+        volume = volume * GA_ENEMY_VOLUME_DOWN_VALUE;
+    }
+
+    u8 engineType = Parameters::getEngineType(_61);
+    startSoundFromID(engineType + 8);
+
+    JAISoundHandle& handle = (*this)[3];
+    if(handle.isSoundAttached())
+    {
+        handle->getAuxiliary().moveVolume(volume, 0);
+        handle->getAuxiliary().movePitch(pitch, 0);
+    }
+}
 
 void KartSoundMgr::setConductOutOfCourse(u8) {}
 
