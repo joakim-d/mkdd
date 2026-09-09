@@ -1454,7 +1454,204 @@ void KartSoundMgr::setConductTrouble(f32 f1, u8 r4) {
     (*handle)->getAuxiliary().movePitch(pitch, 0);
 }
 
-void KartSoundMgr::setConductRace(bool) {}
+void KartSoundMgr::setConductRace(bool r4) {
+    f32 f0;
+    f32 f1;
+    f32 f2;
+    u16 r27 = 0;                 // u16: writePort gets a plain `mr r5, r27`
+    u32 soundOffset;             // not u8: target truncates engineType, not this
+    u32 engineType = Parameters::getEngineType((u8)_61);
+
+    if (_e8[0] == 0x11 || _e8[1] == 0x11 || _e8[2] == 0x11 || _e8[3] == 0x11) {
+        f2 = 215.f;
+        for (u8 index = 0; index < 4U; index++) {
+            f0 = mWaterDepths[index];
+            if (f2 > f0) {
+                f2 = f0;
+            }
+        }
+        if (f2 < 15.f) {
+            f2 = 0.f;
+        } else {
+            if (f2 > 215.f) {
+                f2 = 215.f;
+            }
+            f2 = (f2 - 15.f) / 200.f;
+        }
+        if (f2 == 0.f) {
+            r27 = 0;
+        } else {
+            r27 = -127.f -((126.f * f2));
+        }
+    }
+
+    if ((1.f + _84) > _98) {
+        if (_84 < 1.f) {
+            _100 += 1;
+            if (_100 == 0x14) {
+                _8c = 0;
+                _100 = 0;
+            }
+        }
+        if (_84 > 50.f) {
+            if (_96 < 0x320) {
+                _96++;
+            }
+        }
+    } else {
+        if (_84 < 10.f) {
+            _8c = 0;
+        }
+        if (_96 >= 0x28) {
+            _96 -= 0x28;
+        }
+    }
+
+    if (_8c == 1) {
+        f1 = _fc;
+        if (f1 > 0.f) {
+            _fc = f1 - 1.f;
+        }
+
+        _90 = 0;
+        if (_8e < 0x270fu) {
+            _8e++;
+        }
+        f32 volume;
+        f32 pitch;
+        f32 temp_pitch = ((-0.0016666667f * _84) + 0.3f);
+
+        if (_a0 != 0.f) {
+            s16 r0 = (80.f * _a0);
+            if (_96 > -0xC8) {
+                _96 -= r0;
+            }
+        }
+        adjustEngine();
+        if (_f0 > 0.f) {
+            _fc = 0.f;
+        }
+        u8 index = engineType;
+        pitch = 0.02f * _fc
+            + (_f0
+            + (temp_pitch
+            + (0.5f
+            + (_96 * (EngineAddKeisuuRaceUp[index])
+            + ((_88 * EngineKeisuuRaceUp[index]) + (_84 * EngineKeisuuRaceUp[index]))))));
+        volume = 1.4f;
+
+        if (_84 < 40.f) {
+            volume = 0.3f + (-0.0075000003f * _84 + 1.4f);
+        }
+
+        if ((u8)engineType < 4 && !r4) {
+            soundOffset = 0;
+        } else {
+            soundOffset = 8;
+        }
+
+        if (_66 != 0) {
+            volume *= GA_ENEMY_VOLUME_DOWN_VALUE;
+        }
+        u16 temp = r27;
+
+        if (temp != 0) {
+            volume *= 0.5f + ((0.5f * temp) / 127.f);
+        }
+        startSoundFromID(soundOffset + (u8)engineType);
+
+        JAISoundHandle* handle = &(*this)[3];
+        if (handle->isSoundAttached()) {
+            if (_5d != 0) {
+                f32 chibiPitch = Parameters::getChibiPitch((*handle)->getID());
+                pitch *= chibiPitch;
+                volume *= 0.65f;
+            }
+            (*handle)->getAuxiliary().moveVolume(volume, 0);
+            (*handle)->getAuxiliary().movePitch(pitch, 0);
+            (*handle)->getTrack()->writePort(0xA, r27);
+        }
+
+        if ((u8)engineType < 4) {
+            f1 = (f32)(u32)(_84 * (UpEngineLoopStart[(u8)engineType] / 150.f) - 10000.f);
+            if (f1 < 0.f) {
+                f1 = 0.f;
+            }
+            if (f1 > UpEngineLoopEnd[(u8)engineType]) {
+                f1 = UpEngineLoopEnd[(u8)engineType];
+            }
+
+            // conversion happens before operator[] in the target
+            u32 skip = (u32)f1;
+            JAISoundHandle* handle = &(*this)[3];
+            if (handle->isSoundAttached()) {
+                (*handle)->getTrack()->setSkipSample(skip);
+            }
+        }
+    } else {
+        f32 volume;
+        f32 pitch;
+        _96 = 0;
+        _8e = 0;
+        if (_90 < 0x270fu) {
+            _90++;
+        }
+        adjustEngine();
+
+        u8 index = engineType;
+        pitch = _f0 + (0.7f + (_96 * (EngineAddKeisuuRaceDown[index]) + ((_88 * EngineKeisuuRaceDown[index]) + (_84 * EngineKeisuuRaceDown[index]))));
+
+        if ((u8)engineType < 4) {
+            volume = 1.1f;
+        } else {
+            volume = 0.8f;
+        }
+        if (_84 < 40.f) {
+            volume = 0.4f + ((-0.01f * _84) + volume);
+        }
+
+        if ((u8)engineType < 4 && !r4) {
+            soundOffset = 4;
+        } else {
+            soundOffset = 8;
+        }
+
+        if (_66 != 0) {
+            volume *= GA_ENEMY_VOLUME_DOWN_VALUE;
+        }
+        startSoundFromID(soundOffset + (u8)engineType);
+
+        JAISoundHandle* handle = &(*this)[3];
+        if (handle->isSoundAttached()) {
+            if (_5d != 0) {
+                f32 chibiPitch = Parameters::getChibiPitch((*handle)->getID());
+                pitch *= chibiPitch;
+                volume *= 0.65f;
+            }
+            (*handle)->getAuxiliary().moveVolume(volume, 0);
+            (*handle)->getAuxiliary().movePitch(pitch, 0);
+            (*handle)->getTrack()->writePort(0xA, r27);
+        }
+
+        if ((u8)engineType < 4) {
+            const f32 loopStart = DownEngineLoopStart[(u8)engineType];
+
+            f1 = (f32)(u32)(_84 * -(loopStart / 150.f) + loopStart - 5000.f);
+            if (f1 < 0.f) {
+                f1 = 0.f;
+            }
+            if (f1 > DownEngineLoopEnd[(u8)engineType]) {
+                f1 = DownEngineLoopEnd[(u8)engineType];
+            }
+
+            u32 skip = (u32)f1;
+            JAISoundHandle* handle = &(*this)[3];
+            if (handle->isSoundAttached()) {
+                (*handle)->getTrack()->setSkipSample(skip);
+            }
+        }
+    }
+}
 
 void KartSoundMgr::setConductAfterGoal(bool enable) {
     setConductRace(enable);
