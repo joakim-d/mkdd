@@ -1789,7 +1789,26 @@ void KartSoundMgr::setDashSe(u32 soundID) {
     _f8 = 0x64;
 }
 
-void KartSoundMgr::setMiniturboSe(u32) {}
+void KartSoundMgr::setMiniturboSe(u32 soundID) {
+    if(mKillSw || _66 == 2) {
+        return;
+    }
+
+    if(_66 != 0)
+    {
+        return;
+    }
+
+    this->setSe(soundID);
+
+    u8 engineType = Parameters::getEngineType(_61);
+
+    f32 adjustInitialValue = DashEngineAdjustInitialValue[engineType];
+
+    _f0 = adjustInitialValue;
+    _f4 = 0x10044;
+    _f8 = 0x28;
+}
 
 void KartSoundMgr::setJumpUpSe(u32) {}
 
