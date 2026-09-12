@@ -1736,7 +1736,34 @@ void KartSoundMgr::setCrushSe(u32 r4, f32 f1) {
     _9c = r3 + 4;
 }
 
-void KartSoundMgr::setBrakeSe(u32) {}
+void KartSoundMgr::setBrakeSe(u32 soundID) {
+    f32 volume;
+    f32 pitch;
+
+    if(mKillSw || _66 == 2) {
+        return;
+    }
+
+    if(_66 != 0)
+    {
+        return;
+    }
+
+    startSoundHandleNumber(6, soundID, 0);
+    JAISoundHandle& handle = (*this)[6];
+    if(handle.isSoundAttached())
+    {
+        volume = (0.003f * _84) + 0.6f;
+        pitch = (0.008f * _84) + 0.25f;
+        if(_5d != 0)
+        {
+            pitch = pitch * Parameters::getChibiPitch(soundID);
+        }
+        handle->getAuxiliary().moveVolume(0.8f * volume, 0);
+        handle->getAuxiliary().movePitch(pitch, 0);
+    }
+    setChibiPitch(&handle);
+}
 
 void KartSoundMgr::setDashSe(u32) {}
 
