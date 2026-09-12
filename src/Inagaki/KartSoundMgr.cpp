@@ -1765,7 +1765,29 @@ void KartSoundMgr::setBrakeSe(u32 soundID) {
     setChibiPitch(&handle);
 }
 
-void KartSoundMgr::setDashSe(u32) {}
+void KartSoundMgr::setDashSe(u32 soundID) {
+    if(mKillSw || _66 == 2) {
+        return;
+    }
+
+    if(_66 == 1)
+    {
+        if((u8)Parameters::getRaceMode() != 2)
+        {
+            return;
+        }   
+    }
+
+    this->setSe(soundID);
+
+    u8 engineType = Parameters::getEngineType(_61);
+
+    f32 adjustInitialValue = DashEngineAdjustInitialValue[engineType];
+
+    _f0 = adjustInitialValue;
+    _f4 = 0x10014;
+    _f8 = 0x64;
+}
 
 void KartSoundMgr::setMiniturboSe(u32) {}
 
