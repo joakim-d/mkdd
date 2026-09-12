@@ -1810,7 +1810,19 @@ void KartSoundMgr::setMiniturboSe(u32 soundID) {
     _f8 = 0x28;
 }
 
-void KartSoundMgr::setJumpUpSe(u32) {}
+void KartSoundMgr::setJumpUpSe(u32 soundID) {
+    if(mKillSw || _66 == 2) {
+        return;
+    }
+
+    if(Parameters::getRaceCourse() != 0x22)
+    {
+        return;
+    }
+
+    this->setSe(soundID);
+
+}
 
 void KartSoundMgr::setBoundSe(f32) {}
 
